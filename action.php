@@ -13,50 +13,64 @@
     <h2>Calculation Result</h2>
 
     <?php
+
     // Проверяем, что данные были отправлены методом POST
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Получаем значения из формы
-        $value1 = $_POST['num1'];
-        $value2 = $_POST['num2'];
+        $signs = ['+', '-', '*', '/'];
+
+        foreach ($signs as $i => $sign) {
+            static $index = 1;
+            $answer = $_POST['answer' . $index];
+            $value1 = $_POST['num' . $index * 2 - 1];
+            $value2 = $_POST['num' . $index * 2];
+
+            switch ($sign) {
+                case '+':
+                    $result = $value1 + $value2;
+                    break;
+                case '-':
+                    $result = $value1 - $value2;
+                    break;
+                case '*':
+                    $result = $value1 * $value2;
+                    break;
+                case '/':
+                    $result = $value1 / $value2;
+                    break;
+                default:
+                    $result = "Unsupported sign";
+            }
+            $index++;
 
 
-        // Получаем операцию
-        $operation = $_POST['operation'];
-
-        // Выполняем вычисление в зависимости от операции
-        switch ($operation) {
-            case 'add':
-                $result = $value1 + $value2;
-                break;
-            case 'sub':
-                $result = $value1 - $value2;
-                break;
-                // Аналогично для умножения и деления
-            default:
-                $result = "Unsupported operation";
-        }
-
-        // add to negative numbers ()
-        $value1 = $value1 < 0 ? "($value1)" : $value1;
-        $value2 = $value2 < 0 ? "($value2)" : $value2;
-        $result = $result < 0 ? "($result)" : $result;
-
-        if (is_bool($result)) {
-            $result = round($result, 2);
-        }
+            // check 2 digits after a comma
+            if (is_float($result)) {
+                $result = round($result, 2);
+            }
 
 
-        // check user answer
-        $user_answer = $_POST['answer'];
-        $user_answer = $user_answer < 0 ? "($user_answer)" : $user_answer;
-        if ($result == $user_answer) {
-            echo "Good job!";
-        } else {
-            echo "Your answer is $user_answer and it is wrong!<br>";
-            echo "Correct solution:<br>$value1 + $value2 = $result";
+            // add to negative numbers ()
+            $value1 = $value1 < 0 ? "($value1)" : $value1;
+            $value2 = $value2 < 0 ? "($value2)" : $value2;
+            $result = $result < 0 ? "($result)" : $result;
+
+
+            if ($result < 0 and substr($result, 1, -1) == $answer) {
+                echo "<b>Congratulations</b>, this is the correct answer!<hr>";
+            } elseif ($sign == '+') {
+                echo "Your answer: $answer and it is <b>wrong</b>!<br>Correct solution:<br>$value1 + $value2 = $result <hr>";
+            } elseif ($sign == '-') {
+                echo "Your answer: $answer and it is <b>wrong</b>!<br>Correct solution:<br>$value1 - $value2 = $result<hr>";
+            } elseif ($sign == '*') {
+                echo "Your answer: $answer and it is <b>wrong</b>!<br>Correct solution:<br>$value1 * $value2 = $result<hr>";
+            } elseif ($sign == '/') {
+                echo "Your answer: $answer and it is <b>wrong</b>!<br>Correct solution:<br>$value1 / $value2 = $result<hr>";
+            }
+          
         }
     }
     ?>
+
 
 </body>
 
